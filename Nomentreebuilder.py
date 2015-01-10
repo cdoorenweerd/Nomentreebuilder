@@ -37,12 +37,13 @@ def colreader(n):
 	# /print purgedtaxonlist	 
 	# return purgedtaxonlist for use outside function 
 	return purgedtaxonlist, parentmap
+	ifile.close()
 
 # Create an empty tree to populate
 t = Tree()
 taxonmap = {}
 	
-# Create tree backbone
+# Create tree backbone based on the first column
 backbone, parentmap = colreader(0)
 # print backbone
 for taxon in backbone:
@@ -51,58 +52,25 @@ for taxon in backbone:
 
 # print t
 
+# Determine number of columns in the csv file based on the first row
+with open('/Users/cdoorenweerd/Desktop/systematictree/Final_dataset_CD1.csv','rU') as f:
+    reader = csv.reader(f, delimiter=',', skipinitialspace=True)
+    first_row = next(reader)
+    numcols = len(first_row)
 
-# Add children for level 1
-purgedtaxonlist, parentmap = colreader(1)	
-for taxon in purgedtaxonlist:
-	parentname = parentmap[taxon]
-	parent = taxonmap[parentname]
-	taxonmap.update({taxon:parent.add_child(name=(taxon))})
-
-# print t.get_ascii(show_internal=True)
-
-
-# Add children for level 2
-purgedtaxonlist, parentmap = colreader(2)	
-for taxon in purgedtaxonlist:
-	parentname = parentmap[taxon]
-	parent = taxonmap[parentname]
-	taxonmap.update({taxon:parent.add_child(name=(taxon))})
-
-# print t.get_ascii(show_internal=True)
-
-
-# Add children for level 3
-purgedtaxonlist, parentmap = colreader(3)	
-for taxon in purgedtaxonlist:
-	parentname = parentmap[taxon]
-	parent = taxonmap[parentname]
-	taxonmap.update({taxon:parent.add_child(name=(taxon))})
-
-# print t.get_ascii(show_internal=True)
-
-# Add children for level 4
-purgedtaxonlist, parentmap = colreader(4)	
-for taxon in purgedtaxonlist:
-	parentname = parentmap[taxon]
-	parent = taxonmap[parentname]
-	taxonmap.update({taxon:parent.add_child(name=(taxon))})
+# Add children for levels 1-numcols
+for levels in range (1, numcols):
+	purgedtaxonlist, parentmap = colreader(levels)	
+	for taxon in purgedtaxonlist:
+		parentname = parentmap[taxon]
+		parent = taxonmap[parentname]
+		taxonmap.update({taxon:parent.add_child(name=(taxon))})
 
 print t.get_ascii(show_internal=True)
-
-# Add children for level 5
-# purgedtaxonlist, parentmap = colreader(5)	
-# for taxon in purgedtaxonlist:
-#	parentname = parentmap[taxon]
-#	parent = taxonmap[parentname]
-#	taxonmap.update({taxon:parent.add_child(name=(taxon))})
-#
-# print t.get_ascii(show_internal=True)
-
 
 
 # Output tree files
 # write tree into a newick file with internal node values
-t.write(format=1, outfile="/Users/cdoorenweerd/Desktop/systematictree/final_tree_internalnodes.nwk")
+t.write(format=1, outfile="/Users/cdoorenweerd/Desktop/systematictree/final_tree_internalnodes2.nwk")
 # and one without internal node values
-t.write(format=0, outfile="/Users/cdoorenweerd/Desktop/systematictree/final_tree.nwk")
+t.write(format=0, outfile="/Users/cdoorenweerd/Desktop/systematictree/final_tree2.nwk")
