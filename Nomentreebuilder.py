@@ -11,7 +11,7 @@ from ete2 import Tree
 # Define function to read a column and return list of unique values
 def colreader(n):
 	# Define input file and reader
-	ifile = open('/Users/cdoorenweerd/Desktop/systematictree/Benthos_datasetred.csv','rU')
+	ifile = open('/Users/cdoorenweerd/Desktop/systematictree/Final_dataset_CD1.csv','rU')
 	reader = csv.reader(ifile)
 	# create empty lists and starting point
 	taxonlist = []
@@ -43,6 +43,7 @@ def colreader(n):
 	return purgedtaxonlist, parentmap
 	ifile.close()
 
+# Define function to select nodes with a given number of leaves, size
 def search_by_size(node, size):
      matches = []
      for n in node.traverse("preorder"):
@@ -62,9 +63,6 @@ with open('/Users/cdoorenweerd/Desktop/systematictree/Benthos_datasetred.csv','r
     first_row = next(reader)
     numcols = len(first_row)
 
-# Count number of internal nodes, all nodes except root and leaves, to be able to remove unifurcations
-numintnodes = numcols-1
-
 
 # Create tree backbone based on the first column
 backbone, parentmap = colreader(0)
@@ -73,10 +71,9 @@ for taxon in backbone:
 	# create map with taxa and function to add children
 	taxonmap.update({taxon:t.add_child(name=(taxon))})
 
-print t
 
-# Add internal nodes for levels 1-numintnodes and remove unifurcations
-for level in range (1, numintnodes):
+# Add children for each additional column
+for level in range (1, numcols):
 	purgedtaxonlist, parentmap = colreader(level)	
 	for taxon in purgedtaxonlist:
 		parentname = parentmap[taxon]
@@ -91,17 +88,6 @@ for level in range (1, numintnodes):
 	# remove unifurcations
 	for unifurcation in matches:
 		unifurcation.delete()
-	#print t
-
-#print t
-
-
-# Add final column of children, the leaves
-purgedtaxonlist, parentmap = colreader(numcols)	
-for taxon in purgedtaxonlist:
-	parentname = parentmap[taxon]
-	parent = taxonmap[parentname]
-	taxonmap.update({taxon:parent.add_child(name=(taxon))})
 
 
 print t.get_ascii(show_internal=True)
@@ -109,6 +95,6 @@ print t.get_ascii(show_internal=True)
 
 # Output tree files
 # write tree into a newick file with internal node values
-t.write(format=1, outfile="/Users/cdoorenweerd/Desktop/systematictree/final_tree_internalnodes2.nwk")
+t.write(format=1, outfile="/Users/cdoorenweerd/Desktop/systematictree/final_tree_internalnodes3.nwk")
 # and one without internal node values
-t.write(format=0, outfile="/Users/cdoorenweerd/Desktop/systematictree/final_tree2.nwk")
+t.write(format=0, outfile="/Users/cdoorenweerd/Desktop/systematictree/final_tree3.nwk")
