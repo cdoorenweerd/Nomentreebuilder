@@ -11,7 +11,7 @@ from ete2 import Tree
 # Define function to read a column and return list of unique values
 def colreader(n):
 	# Define input file and reader
-	ifile = open('/Users/cdoorenweerd/Desktop/systematictree/Benthos_datasetred.csv','rU')
+	ifile = open('/Users/cdoorenweerd/Desktop/systematictree/Final_dataset_CD1.csv','rU')
 	reader = csv.reader(ifile)
 	# create empty lists and starting point
 	taxonlist = []
@@ -43,29 +43,10 @@ def colreader(n):
 	return purgedtaxonlist, parentmap
 	ifile.close()
 
-def search_by_size(node, size):
-     matches = []
-     for n in node.traverse("preorder"):
-        if len(n) == size:
-           matches.append(n)       
-     # return the matches            
-     return matches
-
-
 # Create an empty tree to populate
 t = Tree()
 taxonmap = {}
 	
-# Count number of columns in the csv file based on the first row
-with open('/Users/cdoorenweerd/Desktop/systematictree/Benthos_datasetred.csv','rU') as f:
-    reader = csv.reader(f, delimiter=',', skipinitialspace=True)
-    first_row = next(reader)
-    numcols = len(first_row)
-
-# Count number of internal nodes, all nodes except root and leaves, to be able to remove unifurcations
-numintnodes = numcols-1
-
-
 # Create tree backbone based on the first column
 backbone, parentmap = colreader(0)
 # print backbone
@@ -73,36 +54,21 @@ for taxon in backbone:
 	# create map with taxa and function to add children
 	taxonmap.update({taxon:t.add_child(name=(taxon))})
 
-print t
+# print t
 
-# Add internal nodes for levels 1-numintnodes and remove unifurcations
-for level in range (1, numintnodes):
+# Determine number of columns in the csv file based on the first row
+with open('/Users/cdoorenweerd/Desktop/systematictree/Final_dataset_CD1.csv','rU') as f:
+    reader = csv.reader(f, delimiter=',', skipinitialspace=True)
+    first_row = next(reader)
+    numcols = len(first_row)
+
+# Add children for levels 1-numcols
+for level in range (1, numcols):
 	purgedtaxonlist, parentmap = colreader(level)	
 	for taxon in purgedtaxonlist:
 		parentname = parentmap[taxon]
 		parent = taxonmap[parentname]
 		taxonmap.update({taxon:parent.add_child(name=(taxon))})
-	#print t
-	# Search whole tree created up to this point for unifurcations and remove them, comment this section out if you wish to include unifurcations
-	matches = search_by_size(t, size=1)
-	# exclude terminal branches from the list
-	for terminal in t.get_leaves():
-		matches.remove(terminal)
-	# remove unifurcations
-	for unifurcation in matches:
-		unifurcation.delete()
-	#print t
-
-#print t
-
-
-# Add final column of children, the leaves
-purgedtaxonlist, parentmap = colreader(numcols)	
-for taxon in purgedtaxonlist:
-	parentname = parentmap[taxon]
-	parent = taxonmap[parentname]
-	taxonmap.update({taxon:parent.add_child(name=(taxon))})
-
 
 print t.get_ascii(show_internal=True)
 
