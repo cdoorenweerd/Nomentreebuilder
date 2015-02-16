@@ -1,4 +1,4 @@
-!/usr/bin/python
+#!/usr/bin/python
 #
 # Import the csv and ETE tree module
 import csv
@@ -10,9 +10,10 @@ from ete2 import Tree
 
 
 # Define function to read a column and return list of unique values
+# as well as a dictionary with the parents of those values
 def colreader(n):
     # Define input file and reader
-    ifile = open('/Users/cdoorenweerd/Desktop/systematictree/Final_dataset_CD1.csv','rU')
+    ifile = open('/Users/cdoorenweerd/Desktop/systematictree/Example.csv','rU')
     reader = csv.reader(ifile)
     # create empty lists and starting point
     taxonlist = []
@@ -42,6 +43,7 @@ def colreader(n):
     ifile.close()
 
 # Define function to select nodes with a given number of leaves, size
+# This is used for detecting and removing unifurcations
 def search_by_size(node, size):
     matches = []
     for n in node.traverse("preorder"):
@@ -55,7 +57,7 @@ t = Tree()
 taxonmap = {}
 
 # Count number of columns in the csv file based on the first row
-with open('/Users/cdoorenweerd/Desktop/systematictree/Benthos_datasetred.csv','rU') as f:
+with open('/Users/cdoorenweerd/Desktop/systematictree/Example.csv','rU') as f:
     reader = csv.reader(f, delimiter=',',skipinitialspace=True)
     first_row = next(reader)
     numcols = len(first_row)
@@ -66,17 +68,18 @@ for taxon in backbone:
     # create map with taxa and function to add children
     taxonmap.update({taxon:t.add_child(name=(taxon))})
 
-backbonetext = "Added %s nodes to tree backbone"
-print(backbonetext % len(taxonmap))
+print("Added %s nodes to tree backbone"  % (len(taxonmap)))
 
 # Add children for each additional column
 for level in range (1, numcols):
+    taxabefore = len(taxonmap)
     purgedtaxonlist, parentmap = colreader(level)
     for taxon in purgedtaxonlist:
         parentname = parentmap[taxon]
         parent = taxonmap[parentname]
         taxonmap.update({taxon:parent.add_child(name=(taxon))})
-    print("Added %s nodes for level %s" % (len(taxonmap), level))
+    numaddedtaxa = len(taxonmap)-taxabefore
+    print("Added %s nodes for level %s" % (numaddedtaxa, level))
     # Search whole tree created up to this point for unifurcations
     # and remove them, comment this section out if you wish to include
     # unifurcations
@@ -100,3 +103,5 @@ print(t.get_ascii(show_internal=True))
 t.write(format=1, outfile="/Users/cdoorenweerd/Desktop/systematictree/final_tree_internalnodes4.nwk")
 # and one without internal node values
 t.write(format=0, outfile="/Users/cdoorenweerd/Desktop/systematictree/final_tree4.nwk")
+
+exit()
