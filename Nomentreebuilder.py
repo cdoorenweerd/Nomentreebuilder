@@ -4,23 +4,22 @@
 import csv, argparse
 from ete2 import Tree
 
-
+# define parser
 parser = argparse.ArgumentParser(description = 'turn csv file into a phylogenetic tree')
 
-parser.add_argument('-f', '--csv_table', dest='table', type=str,
+# parser arguments
+parser.add_argument('-f', '--csv_table', dest='table', type=str, required=True,
 					help='Input a comma delimited csv file.')
 
+# define arguments list
 args = parser.parse_args()
 
 # Define function to read a column and return list of unique values
 # as well as a dictionary with the parents of those values
 def colreader(n):
-    # Define input file and reader
-    # ifile = open('/Users/cdoorenweerd/Desktop/systematictree/Example.csv','rU')
-	# reader = csv.reader(ifile)
+    # open defined input file and reader object
     ifile = open((args.table), 'rU')
     reader = csv.reader(ifile)
-    # reader = csv.reader(ifile)
     # create empty lists and starting point
     taxonlist = []
     purgedtaxonlist = []
