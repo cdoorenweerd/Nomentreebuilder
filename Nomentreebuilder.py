@@ -1,20 +1,26 @@
-#!/usr/bin/python
+#! /usr/bin/env python
 #
-# Import the csv and ETE tree module
-import csv
+# Import the csv, argument parser and ETE tree modules
+import csv, argparse
 from ete2 import Tree
 
 
-# Ask for input file [work in progress, will use argparser]
-# ifile = raw_input("Enter filename: ")
+parser = argparse.ArgumentParser(description = 'turn csv file into a phylogenetic tree')
 
+parser.add_argument('-f', '--csv_table', dest='table', type=str,
+					help='Input a comma delimited csv file.')
+
+args = parser.parse_args()
 
 # Define function to read a column and return list of unique values
 # as well as a dictionary with the parents of those values
 def colreader(n):
     # Define input file and reader
-    ifile = open('/Users/cdoorenweerd/Desktop/systematictree/Example.csv','rU')
+    # ifile = open('/Users/cdoorenweerd/Desktop/systematictree/Example.csv','rU')
+	# reader = csv.reader(ifile)
+    ifile = open((args.table), 'rU')
     reader = csv.reader(ifile)
+    # reader = csv.reader(ifile)
     # create empty lists and starting point
     taxonlist = []
     purgedtaxonlist = []
